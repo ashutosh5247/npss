@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import React, {useEffect} from 'react';
 import {SafeAreaView, StyleSheet, View} from 'react-native';
 
@@ -6,18 +7,20 @@ import {Provider, useStore} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {Text} from 'react-native-paper';
 import NewComp from './src/components/x';
+import {NavigationContainer} from '@react-navigation/native';
+import AppNavigation from './src/navigation';
+import {navigationRef} from './src/navigation/navigation.service';
 
-function App(): JSX.Element {
+function App() {
   const {store, persistor} = Configurestore();
 
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor} loading={null}>
         <SafeAreaView style={styles.safeAreaContainer}>
-          <View>
-            <Text>qdqdwqdwq</Text>
-            <NewComp />
-          </View>
+          <NavigationContainer ref={navigationRef}>
+            <AppNavigation />
+          </NavigationContainer>
         </SafeAreaView>
       </PersistGate>
     </Provider>
