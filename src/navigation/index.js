@@ -2,23 +2,25 @@ import React, {useCallback, useContext, useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import {createStackNavigator} from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { appRoutes } from './app.navigation';
-import { authRoutes } from './auth.navigation';
+import {AppRoutes} from './app.navigation';
+import {AuthRoutes} from './auth.navigation';
 
 const RootStack = createStackNavigator();
 
 function AppNavigation() {
-  // let isloggedIn = useSelector(state => state?.authReducer?.loggedIn);
-  let isloggedIn = true;
+  let isloggedIn = useSelector(state => state?.authReducer?.loggedIn);
+  console.log('isloggedIn', isloggedIn);
+
+  // let isloggedIn = false;
 
   useEffect(() => {}, []);
 
   return (
     <RootStack.Navigator initialRouteName={isloggedIn ? 'App' : 'Auth'}>
-      {!isloggedIn ? (
+      {!Boolean(isloggedIn) ? (
         <RootStack.Screen
           name="Auth"
-          component={authRoutes}
+          component={AuthRoutes}
           options={{
             headerShown: false,
           }}
@@ -26,7 +28,7 @@ function AppNavigation() {
       ) : (
         <RootStack.Screen
           name="App"
-          component={appRoutes}
+          component={AppRoutes}
           options={{
             headerShown: false,
           }}

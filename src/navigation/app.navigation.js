@@ -4,7 +4,7 @@ import DashboardScreen from '../screens/app/dashboardscreen';
 
 const AppStack = createStackNavigator();
 
-export function appRoutes() {
+export function AppRoutes() {
   return (
     <AppStack.Navigator initialRouteName={ROUTES.APP.DASHBOARDSCREEN}>
       <AppStack.Screen
