@@ -1,9 +1,8 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, Image, TextInput} from 'react-native';
 import Colors from '../Res/Utils/Colors';
-import Fonts from '../Res/Utils/Fonts';
-import CommonStyles from '../Res/Utils/CommonStyles';
 import PropTypes from 'prop-types';
+import Fonts from './Fonts';
 // import {TextInput} from 'react-native-paper';
 const CustomTextInput = ({
   placeholder,
@@ -42,7 +41,7 @@ const CustomTextInput = ({
               height: numberOfLines == 1 ? 45 : numberOfLines * 33,
               flex: 1,
               fontSize: 16,
-              fontFamily: Fonts.GothicRegular,
+              fontFamily: Fonts,
               color: Colors.textInputBorder,
               borderWidth: 1,
               borderColor: Colors.themeColor,
