@@ -1,11 +1,47 @@
-import {View, Text, FlatList, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  Alert,
+  SafeAreaView,
+  ScrollView,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {TextHandler} from '../../components/index';
+import {OfflineNotice, TextHandler} from '../../components/index';
 import styles from './style';
 import {Checkbox, TextInput} from 'react-native-paper';
+import NetInfo, {useNetInfo} from '@react-native-community/netinfo';
 import {COMPONENT} from '../../utils/dyanmicComponentRenderer';
+import NetworkCheck from '../../components/NetworkCheck';
+import fetchAPIData from '../../networking/api.network';
+import {useDispatch, useSelector, useStore} from 'react-redux';
+import {ACTION_CONSTANTS} from '../../redux/actions/actions';
 
 export default function LoginScreen() {
+  const [offlineModalVisble, setofflineModalVisible] = useState(false);
+  const [connectionStatus, setConnectionStatus] = React.useState(false);
+  const [connectionType, setConnectionType] = React.useState(null);
+  const [apiCall, setApiCall] = useState(false);
+  const dispatch = useDispatch();
+  const store = useSelector(state => state.payloadReducer);
+
+  const handleNetworkChange = async state => {
+    setConnectionStatus(state.isConnected);
+    setConnectionType(state.type);
+    if (state.isConnected && !apiCall) {
+      // console.log('state->', state);
+      setApiCall(true);
+      const data = await fetchAPIData();
+      console.log('data->', data);
+      if (!store?.data) {
+        dispatch({
+          type: ACTION_CONSTANTS.DATA_FETCHED_SUCCESSFUL,
+          payload: data,
+        });
+      }
+    }
+  };
+
   let temp = [
     {
       fieldName: 'First Name',
@@ -45,8 +81,29 @@ export default function LoginScreen() {
   ];
 
   useEffect(() => {
-    console.log(activeControl);
-  }, [activeControl]);
+    console.log('store-.', store);
+  }, []);
+
+  useEffect(() => {
+    const netInfoSubscription = NetInfo.addEventListener(handleNetworkChange);
+    return () => {
+      netInfoSubscription && netInfoSubscription();
+    };
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      if (!state.isConnected) {
+        setofflineModalVisible(true);
+      } else {
+        setofflineModalVisible(false);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const [formcontrols, setFormControls] = useState(temp);
   const [activeControl, setActiveControl] = useState({key: null, index: 0});
@@ -113,6 +170,25 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <TextHandler>LoginScreen</TextHandler>
+
+      {connectionStatus ? (
+        <ScrollView contentInsetAdjustmentBehavior="automatic">
+          <View>
+            <TextHandler>
+              {'Connection Status : ' + connectionStatus
+                ? 'Connected'
+                : 'Disconnected'}
+            </TextHandler>
+            <TextHandler>
+              {'You are connected by ' + connectionType}
+            </TextHandler>
+          </View>
+        </ScrollView>
+      ) : (
+        <View style={styles.container}>
+          <NetworkCheck status={connectionStatus} type={connectionType} />
+        </View>
+      )}
       <FlatList
         style={{flex: 1}}
         data={temp}
@@ -120,6 +196,7 @@ export default function LoginScreen() {
           return compoentRenderer(item, index);
         }}
       />
+      <TextHandler>{store?.data?.title || ''}</TextHandler>
     </View>
   );
 }
